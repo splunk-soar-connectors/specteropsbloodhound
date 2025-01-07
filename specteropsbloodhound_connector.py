@@ -371,7 +371,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Unable to query Cybereason Malop container: {0}".format(err))
+            self.debug_print("Unable to query container: {0}".format(err))
             return False
 
         if resp_json.get("count", 0) <= 0:
