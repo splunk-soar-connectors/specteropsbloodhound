@@ -1,0 +1,267 @@
+{
+    "appid": "f657a38f-6649-4022-8d93-21fb69a51055",
+    "name": "SpecterOps BloodHound",
+    "description": "BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly. Defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with SpecterOps BloodHound enables the defenders to see all the attack path findings from BloodHound as Splunk SOAR events. The actions provided with the app can be used to remediate and remove the attack paths.",
+    "type": "network security",
+    "product_vendor": "SpecterOps",
+    "logo": "specteropsbloodhound.svg",
+    "logo_dark": "specteropsbloodhound_dark.svg",
+    "product_name": "Specterops Bloodhound",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "SpecterOps",
+    "license": "Copyright (c) SpecterOps, 2024",
+    "app_version": "1.0.0",
+    "utctime_updated": "2024-11-22T08:03:27.498107Z",
+    "package_name": "phantom_specteropsbloodhound",
+    "main_module": "specteropsbloodhound_connector.py",
+    "min_phantom_version": "6.3.0.718",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "bloodhound_base_url": {
+            "description": "BloodHound Enterprise Domain",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "https://demo.bloodhoundenterprise.io",
+            "order": 0,
+            "name": "bloodhound_base_url",
+            "id": 0
+        },
+        "token_id": {
+            "description": "Token ID",
+            "data_type": "password",
+            "required": true,
+            "order": 1,
+            "name": "token_id",
+            "id": 1
+        },
+        "token_key": {
+            "description": "Token Key",
+            "data_type": "password",
+            "required": true,
+            "order": 2,
+            "name": "token_key",
+            "id": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Pull Attack Path Finding Details",
+            "verbose": "",
+            "type": "ingest",
+            "read_only": false,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "fetch asset information",
+            "identifier": "fetch_asset_information",
+            "description": "Pull information related to an asset from the API (works in Enterprise or CE)",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "object_id": {
+                    "description": "Object Id",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "object_id",
+                    "id": 1,
+                    "param_name": "object_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.data.props.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.domain",
+                    "data_type": "string",
+                    "column_name": "domain",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.objectid",
+                    "data_type": "string",
+                    "column_name": "object id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.domainsid",
+                    "data_type": "string",
+                    "column_name": "domain sid",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.functionallevel",
+                    "data_type": "string",
+                    "column_name": "functional level",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.distinguishedname",
+                    "data_type": "string",
+                    "column_name": "distinguished name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.isaclprotected",
+                    "data_type": "boolean",
+                    "column_name": "is ACL protected",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.data.*.props.system_tags",
+                    "data_type": "string",
+                    "column_name": "system tags",
+                    "column_order": 8
+                }
+            ],
+            "render": {
+                "type": "table",
+                "Name": "Asset Information"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "does path exist",
+            "identifier": "does_path_exist",
+            "description": "Pull a path between two objects (works in Enterprise or CE)",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "start_node": {
+                    "description": "Start Node",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "start_node",
+                    "id": 1,
+                    "param_name": "start_node"
+                },
+                "end_node": {
+                    "description": "End Node",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "end_node",
+                    "id": 2,
+                    "param_name": "end_node"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.start_node",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "start_name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.end_node",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "end_node",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.response",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "does path exist",
+                    "column_order": 1
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get object id",
+            "identifier": "get_object_id",
+            "description": "Fetch object id from asset's name",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "name",
+                    "id": 1,
+                    "param_name": "name"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.object_id",
+                    "data_type": "string",
+                    "column_name": "object_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
