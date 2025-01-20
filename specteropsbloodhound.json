@@ -1,7 +1,7 @@
 {
     "appid": "f657a38f-6649-4022-8d93-21fb69a51055",
     "name": "SpecterOps BloodHound",
-    "description": "BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly. Defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with SpecterOps BloodHound enables the defenders to see all the attack path findings from BloodHound as Splunk SOAR events. The actions provided with the app can be used to remediate and remove the attack paths.",
+    "description": "BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly. Defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with SpecterOps BloodHound enables the defenders to see all the attack path findings from BloodHound as Splunk SOAR events. The actions provided with the app can be used to remediate and remove the attack paths",
     "type": "network security",
     "product_vendor": "SpecterOps",
     "logo": "specteropsbloodhound.svg",
@@ -50,7 +50,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -61,7 +60,6 @@
             "action": "on poll",
             "identifier": "on_poll",
             "description": "Pull Attack Path Finding Details",
-            "verbose": "",
             "type": "ingest",
             "read_only": false,
             "parameters": {},
@@ -72,7 +70,6 @@
             "action": "fetch asset information",
             "identifier": "fetch_asset_information",
             "description": "Pull information related to an asset from the API (works in Enterprise or CE)",
-            "verbose": "",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -95,49 +92,71 @@
                     "data_path": "action_result.data.*.data.props.name",
                     "data_type": "string",
                     "column_name": "name",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.data.props.domain",
                     "data_type": "string",
                     "column_name": "domain",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.data.props.objectid",
                     "data_type": "string",
                     "column_name": "object id",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.data.props.domainsid",
                     "data_type": "string",
                     "column_name": "domain sid",
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.data.props.functionallevel",
                     "data_type": "string",
                     "column_name": "functional level",
-                    "column_order": 5
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.data.props.distinguishedname",
                     "data_type": "string",
                     "column_name": "distinguished name",
-                    "column_order": 6
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.data.props.isaclprotected",
                     "data_type": "boolean",
                     "column_name": "is ACL protected",
-                    "column_order": 7
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.data.*.props.system_tags",
                     "data_type": "string",
                     "column_name": "system tags",
-                    "column_order": 8
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -150,7 +169,6 @@
             "action": "does path exist",
             "identifier": "does_path_exist",
             "description": "Pull a path between two objects (works in Enterprise or CE)",
-            "verbose": "",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -201,7 +219,29 @@
                     "data_type": "string",
                     "contains": [],
                     "column_name": "does path exist",
-                    "column_order": 1
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -213,7 +253,6 @@
             "action": "get object id",
             "identifier": "get_object_id",
             "description": "Fetch object id from asset's name",
-            "verbose": "",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -250,12 +289,22 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
