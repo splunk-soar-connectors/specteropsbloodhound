@@ -157,6 +157,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -242,6 +246,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -305,6 +313,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -312,5 +324,29 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": [
+            {
+                "module": "certifi",
+                "input_file": "wheels/py3/certifi-2024.12.14-py3-none-any.whl"
+            },
+            {
+                "module": "charset_normalizer",
+                "input_file": "wheels/py39/charset_normalizer-3.4.1-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/py3/idna-3.10-py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/py3/requests-2.32.3-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/py3/urllib3-2.3.0-py3-none-any.whl"
+            }
+        ]
+    }
 }
