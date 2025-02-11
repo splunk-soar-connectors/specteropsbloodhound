@@ -24,6 +24,7 @@ class RetVal(tuple):
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
 
+
 class SpecteropsbloodhoundConnector(BaseConnector):
 
     def __init__(self):
@@ -126,7 +127,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("Testing Connectivity...")
         ret_val, response = self._request("GET", "/api/version", action_result)
-        
+
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
@@ -146,7 +147,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.save_progress("Successfully Connected to SPECTEROPS BLOODHOUND ENTERPRISE")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    
+
     def _get_available_types_for_domain(self, domain_id, action_result):
         # Fetch available types for the domain
         self.save_progress(f"Fetch available types for the domain ID: {domain_id}")
@@ -154,25 +155,34 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         ret_val, path_ids_response = self._request('GET', endpoint, action_result)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, f"Failed to fetch types for Domain ID: {domain_id}")
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Failed to fetch types for Domain ID: {domain_id}"
+            )
         # Here, types is a list of strings
         types = path_ids_response['data']
         self.debug_print(f"Fetched Types for Domain ID {domain_id}: {types}")
         self.save_progress(f"The domain with ID {domain_id} has {len(types)} types in total")
         return types
-        
+
     def _fetch_finding_details_by_pages(self, domain_id, finding_type, skip, limit, action_result):
         # Using the finding_type directly as it's a string now
-        self.debug_print(f"Fetching findings for domain id {domain_id} and type {finding_type} for current page")
+        self.debug_print(
+            f"Fetching findings for domain id {domain_id} and type {finding_type} for current page"
+        )
         self.debug_print(f"Fetch {limit} finding by skipping {skip} findings")
-        findings_endpoint = f'/api/v2/domains/{domain_id}/details?finding={finding_type}&skip={skip}&limit={limit}'
+        findings_endpoint = (
+            f"/api/v2/domains/{domain_id}/details?"
+            f"finding={finding_type}&skip={skip}&limit={limit}"
+        )
         ret_val, details_response = self._request('GET', findings_endpoint, action_result)
         if phantom.is_fail(ret_val):
-            self.save_progress(f"Failed to fetch findings for Finding Type: {finding_type} in Domain ID: {domain_id}")
+            self.save_progress(
+            f"Failed to fetch findings for Finding Type: {finding_type} in Domain ID: {domain_id}"
+            )
             return
         return ret_val, details_response
-    
-    
+
     def _fetch_all_findings_information(self, domain_id, finding_type, action_result):
         self.save_progress(f"Fetching ALL the findings for domain id {domain_id} and type {finding_type}")
         all_findings_for_type = []
@@ -189,10 +199,10 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             all_findings_for_type.extend(data)
             skip = skip + len(details_response['data'])
             self.debug_print(f"Fetched {details_response['count']} findings in this page")
-        
+
         self.save_progress(f"Successfully fetched total {len(all_findings_for_type)} findings for domain id {domain_id} and type {finding_type}")
         return all_findings_for_type
-    
+
     def _fetch_severity_for_attack_path_type(self, domain_id, finding_type, action_result):
         self.save_progress(f"Fetching severity for the domain ID {domain_id} and type {finding_type}")
         findings_endpoint = f'/api/v2/domains/{domain_id}/sparkline?finding={finding_type}&sort_by=updated_at'
@@ -205,32 +215,31 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.debug_print("Fetch the Composite Risk from the last sparkline")
         composite_risk = sparklines_response['data'][num_sparklines-1]['CompositeRisk']
         self.debug_print(f"Fetched composite risk for finding type {finding_type} as {composite_risk}")
-        
+
         return composite_risk
-    
+
     def _get_cef_type(self, field_name):
         self.debug_print("Get the CEF type for the fields, as per it's name")
         # Following are all the possible field types, we have only mapped a few out of those
-        #"vault id", "file name", "file path", "hash", "host name", "ip", "mac address", "md5", "port", "process name", "sha1", "sha256", "sha512", "url"
+        # ( "vault id", "file name", "file path", "hash", "host name", "ip", "mac address",
+        #  "md5", "port", "process name", "sha1", "sha256", "sha512", "url" )
         field_name_to_type_map = {
             "domain": "domain",
             "email": "user id"
         }
         return field_name_to_type_map.get(field_name)
-    
+
     def _create_cef_field_and_types_for_principal(self, props):
         self.debug_print("Creating the CEF fields and types for the Principal")
         cef = {}
         cef_types = {}
         for key in props:
-           cef[key] = props[key]
-           
-           field_type = self._get_cef_type(key)
-           if field_type:
+            cef[key] = props[key]
+            field_type = self._get_cef_type(key)
+            if field_type:
                 cef_types[key] = [field_type]
-                
         return cef, cef_types
-    
+
     def _modify_principal_label(self,data, text):
         if isinstance(data, dict):  # Check if data is a dictionary
             if text == 'FromPrincipal':
@@ -238,15 +247,15 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                     return 'Group'
                 else:
                     return 'Non Tier Zero Principal'
-        
+
             elif text == 'ToPrincipal':
                 if data.get('Finding', '').startswith('LargeDefault'):
                     return 'Principal'
                 else:
                     return 'Tier Zero Principal'
-    
+
         return 'User'
-        
+
     def _create_principle_artifact_details(self, finding):
         self.debug_print("Creating the artifact details")
         principal_artifact_details = None
@@ -261,9 +270,8 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 "cef": cef,
                 "cef_types": cef_types
             }
-        
         return principal_artifact_details
-    
+
     def _create_to_principle_artifact_details(self, finding):
         self.debug_print("Creating the artifact details for ToPrincipal")
         principal_artifact_details = None
@@ -278,9 +286,9 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 "cef": cef,
                 "cef_types": cef_types
             }
-        
+
         return principal_artifact_details
-    
+
     def _create_from_principle_artifact_details(self, finding):
         self.debug_print("Creating the artifact details for From Principal")
         principal_artifact_details = None
@@ -295,13 +303,13 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 "cef": cef,
                 "cef_types": cef_types
             }
-        
+
         return principal_artifact_details
-        
-    
+
+
     def _get_artifacts_dict_for_finding(self, finding):
         self.debug_print(f"Building finding artifacts for the Finding type {finding['Finding']}")
-        
+
         artifacts = []
         if "PrincipalKind" in finding:
             artifacts.append(self._create_principle_artifact_details(finding))
@@ -309,9 +317,9 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             artifacts.append(self._create_to_principle_artifact_details(finding))
         if "ToPrincipalKind" in finding:
             artifacts.append(self._create_from_principle_artifact_details(finding))
-            
+
         return artifacts
-        
+
     def _convert_risk_to_severity(self, composite_risk):
         severity = 'low'
         if composite_risk > 33.33:
@@ -319,7 +327,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         if composite_risk > 66.66:
             severity = 'high'
         return severity
-    
+
     def _get_finding_title(self, path_id, action_result):
         if not hasattr(self, '_title_cache'):
             self._title_cache = {}
@@ -337,7 +345,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self._title_cache[path_id] = path_title.strip()
 
         return path_title
-        
+
     def _get_container_dict_for_finding(self, finding, domain_name, action_result):
         finding_id = finding["id"]
         finding_type = finding["Finding"]
@@ -386,7 +394,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             return False
 
         return existing_container_id
-    
+
     def _update_container_for_attack_finding(self, existing_container_id, container):
         # First, update the container without updating any artifacts
         try:
@@ -407,7 +415,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             return False
 
         return True
-        
+
     def _ingest_finding(self, finding, domain_name, action_result):
         finding_id = finding["id"]
         success = phantom.APP_ERROR
@@ -425,7 +433,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             is_new_container_created = False
         self.num_artifacts += len(container["artifacts"])
         return is_new_container_created if success else phantom.APP_ERROR
-    
+
     def _get_artifact(self, source_data_identifier, container_id):
         url = '{0}rest/artifact?_filter_source_data_identifier="{1}"&_filter_container_id={2}&sort=id&order=desc'.format(
                         self.get_phantom_base_url(), source_data_identifier, container_id)
@@ -453,7 +461,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             self.debug_print("Exception when parsing artifact results: {0}".format(err))
             return None
 
-        
+
     def _save_or_update_artifact(self, container_id, artifact):
         existing_artifact = self._get_artifact(artifact["source_data_identifier"], container_id)
         if existing_artifact:
@@ -497,7 +505,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         container_count = 0
         repeated_container_count = 0
         self.debug_print("Loop through each domain")
-        max_limit_reached = False 
+        max_limit_reached = False
         for domain in domains:
             domain_id = domain['id']
             domain_name = domain['name']
@@ -511,12 +519,12 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 
                 self.debug_print(f"Add Composite Risk value {composite_risk} to each finding")
                 for single_finding in all_findings_for_type:
-                    single_finding['composite_risk'] = composite_risk                        
-                    is_new_container_created = self._ingest_finding(single_finding, domain_name, action_result)                
+                    single_finding['composite_risk'] = composite_risk
+                    is_new_container_created = self._ingest_finding(single_finding, domain_name, action_result)
                     if is_new_container_created:
                         container_count+=1
                     else:
-                        repeated_container_count+=1                    
+                        repeated_container_count+=1
                     # Check if the max container limit is reached
                     max_limit_reached = (max_container_limit is not None and container_count >= max_container_limit) or \
                         (max_artifact_limit is not None and self.num_artifacts >= max_artifact_limit)
@@ -652,7 +660,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         else:
             return action_result.set_status(phantom.APP_SUCCESS, f'Object Id not available')
 
-        
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
         action_id = self.get_action_identifier()
@@ -704,4 +712,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
