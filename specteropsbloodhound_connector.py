@@ -297,7 +297,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             principal_artifact_details = {
                 "source_data_identifier": finding['FromPrincipal'],
                 "name": finding['FromPrincipalProps']['name'],
-                "description": finding['FromPrincipalProps'].get('description', 
+                "description": finding['FromPrincipalProps'].get('description',
                     f"FromPrincipal of with name {finding['FromPrincipalProps']['name']}"),
                 "type": finding['FromPrincipalKind'],
                 "label": self._modify_principal_label(finding, "FromPrincipal"),
@@ -419,7 +419,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     def _ingest_finding(self, finding, domain_name, action_result):
         finding_id = finding["id"]
         success = phantom.APP_ERROR
-        container = self._get_container_dict_for_finding(finding,domain_name, action_result)
+        container = self._get_container_dict_for_finding(finding, domain_name, action_result)
         existing_container_id = self._does_container_exist_for_finding(container["source_data_identifier"])
         is_new_container_created = False
         if not existing_container_id:
@@ -662,9 +662,9 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 action_result.add_data({'object_id': exact_match})
                 return action_result.set_status(phantom.APP_SUCCESS)
             else:
-                return action_result.set_status(phantom.APP_SUCCESS, f'Exact match not found')
+                return action_result.set_status(phantom.APP_SUCCESS, 'Exact match not found')
         else:
-            return action_result.set_status(phantom.APP_SUCCESS, f"Object Id not available")
+            return action_result.set_status(phantom.APP_SUCCESS, "Object Id not available")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
