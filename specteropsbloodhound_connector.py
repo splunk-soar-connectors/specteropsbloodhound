@@ -4,19 +4,13 @@
 # Phantom sample App Connector python file
 # -----------------------------------------
 
-# Standard library imports
 import base64
 import datetime
 import hashlib
 import hmac
-# Typing imports
 from typing import Optional
-
-# Third-party imports
-import requests
-
-# Phantom App imports
 import phantom.app as phantom
+import requests
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from specteropsbloodhound_consts import *
