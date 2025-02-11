@@ -13,13 +13,13 @@ import hmac
 # Typing imports
 from typing import Optional
 
+# Third-party imports
+import requests
+
 # Phantom App imports
 import phantom.app as phantom
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-
-# Third-party imports
-import requests
 
 
 # Local imports
