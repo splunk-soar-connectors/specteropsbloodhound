@@ -9,7 +9,6 @@ import base64
 import datetime
 import hashlib
 import hmac
-
 # Typing imports
 from typing import Optional
 
@@ -20,9 +19,6 @@ import requests
 import phantom.app as phantom
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-
-
-# Local imports
 from specteropsbloodhound_consts import *
 
 
