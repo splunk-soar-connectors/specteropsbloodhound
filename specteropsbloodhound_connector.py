@@ -147,7 +147,6 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.save_progress("Successfully Connected to SPECTEROPS BLOODHOUND ENTERPRISE")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-
     def _get_available_types_for_domain(self, domain_id, action_result):
         # Fetch available types for the domain
         self.save_progress(f"Fetch available types for the domain ID: {domain_id}")
@@ -178,7 +177,8 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         ret_val, details_response = self._request('GET', findings_endpoint, action_result)
         if phantom.is_fail(ret_val):
             self.save_progress(
-            f"Failed to fetch findings for Finding Type: {finding_type} in Domain ID: {domain_id}"
+                f"Failed to fetch findings for Finding Type: {finding_type}"
+                f" in Domain ID: {domain_id}"
             )
             return
         return ret_val, details_response
@@ -240,7 +240,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 cef_types[key] = [field_type]
         return cef, cef_types
 
-    def _modify_principal_label(self,data, text):
+    def _modify_principal_label(self, data, text):
         if isinstance(data, dict):  # Check if data is a dictionary
             if text == 'FromPrincipal':
                 if data.get('Finding', '').startswith('LargeDefault'):
@@ -266,7 +266,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 "name": finding['Props']['name'],
                 "description": finding['Props'].get('description', f"Principal with name {finding['Props']['name']}"),
                 "type": finding['PrincipalKind'],
-                "label": self._modify_principal_label(finding,"Principal"),
+                "label": self._modify_principal_label(finding, "Principal"),
                 "cef": cef,
                 "cef_types": cef_types
             }
@@ -282,7 +282,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 "name": finding['ToPrincipalProps']['name'],
                 "description": finding['ToPrincipalProps'].get('description', f"ToPrincipal of with name {finding['ToPrincipalProps']['name']}"),
                 "type": finding['ToPrincipalKind'],
-                "label": self._modify_principal_label(finding,"ToPrincipal"),
+                "label": self._modify_principal_label(finding, "ToPrincipal"),
                 "cef": cef,
                 "cef_types": cef_types
             }
@@ -297,15 +297,15 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             principal_artifact_details = {
                 "source_data_identifier": finding['FromPrincipal'],
                 "name": finding['FromPrincipalProps']['name'],
-                "description": finding['FromPrincipalProps'].get('description', f"FromPrincipal of with name {finding['FromPrincipalProps']['name']}"),
+                "description": finding['FromPrincipalProps'].get('description', 
+                    f"FromPrincipal of with name {finding['FromPrincipalProps']['name']}"),
                 "type": finding['FromPrincipalKind'],
-                "label": self._modify_principal_label(finding,"FromPrincipal"),
+                "label": self._modify_principal_label(finding, "FromPrincipal"),
                 "cef": cef,
                 "cef_types": cef_types
             }
 
         return principal_artifact_details
-
 
     def _get_artifacts_dict_for_finding(self, finding):
         self.debug_print(f"Building finding artifacts for the Finding type {finding['Finding']}")
@@ -349,7 +349,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     def _get_container_dict_for_finding(self, finding, domain_name, action_result):
         finding_id = finding["id"]
         finding_type = finding["Finding"]
-        path_title = self._get_finding_title(finding_type,action_result)
+        path_title = self._get_finding_title(finding_type, action_result)
         self.debug_print(f"Building container for finding {finding['id']}")
         # Build the container JSON
         container_json = {}
@@ -419,7 +419,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     def _ingest_finding(self, finding, domain_name, action_result):
         finding_id = finding["id"]
         success = phantom.APP_ERROR
-        container = self._get_container_dict_for_finding(finding,domain_name,action_result)
+        container = self._get_container_dict_for_finding(finding,domain_name, action_result)
         existing_container_id = self._does_container_exist_for_finding(container["source_data_identifier"])
         is_new_container_created = False
         if not existing_container_id:
@@ -461,7 +461,6 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             self.debug_print("Exception when parsing artifact results: {0}".format(err))
             return None
 
-
     def _save_or_update_artifact(self, container_id, artifact):
         existing_artifact = self._get_artifact(artifact["source_data_identifier"], container_id)
         if existing_artifact:
@@ -475,7 +474,6 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             self.debug_print('Saving new artifact {0}'.format(artifact["name"]), artifact)
             artifact["container_id"] = container_id
             self.save_artifact(artifact)
-
 
     def _handle_on_poll(self, param):
         self.debug_print(f"In action handler for: {self.get_action_identifier()}")
@@ -516,27 +514,30 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 # Using the finding_type directly as it's a string now
                 all_findings_for_type = self._fetch_all_findings_information(domain_id, finding_type, action_result)
                 composite_risk = self._fetch_severity_for_attack_path_type(domain_id, finding_type, action_result)
-                
+
                 self.debug_print(f"Add Composite Risk value {composite_risk} to each finding")
                 for single_finding in all_findings_for_type:
                     single_finding['composite_risk'] = composite_risk
                     is_new_container_created = self._ingest_finding(single_finding, domain_name, action_result)
                     if is_new_container_created:
-                        container_count+=1
+                        container_count += 1
                     else:
-                        repeated_container_count+=1
+                        repeated_container_count += 1
                     # Check if the max container limit is reached
                     max_limit_reached = (max_container_limit is not None and container_count >= max_container_limit) or \
                         (max_artifact_limit is not None and self.num_artifacts >= max_artifact_limit)
                     if max_limit_reached:
                         if max_artifact_limit is not None and self.num_artifacts > max_artifact_limit:
-                            self.save_progress(f'{self.num_artifacts-max_artifact_limit} extra artifacts is created to maintain correct container details')
+                            self.save_progress(
+                                f"{self.num_artifacts - max_artifact_limit} extra artifacts "
+                                "is created to maintain correct container details"
+                            )
                         break
                 if max_limit_reached:
                     break
             if max_limit_reached:
                 break
-        
+
         self.save_progress(f"Finished poll by fetching {container_count} attack paths from {len(domains)} available domains")
         if repeated_container_count > 0:
             self.save_progress(f"{repeated_container_count} number of findings were repeated")
@@ -613,10 +614,16 @@ class SpecteropsbloodhoundConnector(BaseConnector):
 
     def _update_primary_response(self, primary_response, object_id, obj_type, related_type, mapping_key, action_result):
         """Update the primary response with data from related types."""
-        api_path = f'/api/v2/azure/{self._get_azure_type_path(obj_type)}?object_id={object_id}&related_entity_type={related_type}&skip=0&limit=128'
+        api_path = (
+            f"/api/v2/azure/{self._get_azure_type_path(obj_type)}"
+            f"?object_id={object_id}&related_entity_type={related_type}"
+            "&skip=0&limit=128"
+        )
         secondary_response = self._call_api(api_path, action_result)
         if not secondary_response or 'count' not in secondary_response:
-            action_result.append_to_message(f"Failed to fetch data for related type: {related_type}")
+            action_result.append_to_message(
+                f"Failed to fetch data for related type: {related_type}"
+            )
             return
 
         count_value = secondary_response['count']
@@ -629,7 +636,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             action_result.append_to_message(f"Failed to fetch data for API: {path}")
             return None
         return response
-    
+
     def _handle_does_path_exist(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -637,12 +644,11 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         end_node = param.get('end_node')
         endpoint = f'/api/v2/graphs/shortest-path?start_node={start_node}&end_node={end_node}'
         ret_val, response = self._request('GET', endpoint, action_result)
-        if ret_val==True:
+        if ret_val:
             action_result.add_data({'response': True})
         else:
             action_result.add_data({'response': False})
         return action_result.set_status(phantom.APP_SUCCESS)
-
 
     def _handle_get_object_id(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -653,13 +659,12 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         if data:
             exact_match = next((item['objectid'] for item in data if item['name'].strip() == param.get('name')), None)
             if exact_match :
-                action_result.add_data({'object_id':exact_match})
+                action_result.add_data({'object_id': exact_match})
                 return action_result.set_status(phantom.APP_SUCCESS)
             else:
                 return action_result.set_status(phantom.APP_SUCCESS, f'Exact match not found')
         else:
-            return action_result.set_status(phantom.APP_SUCCESS, f'Object Id not available')
-
+            return action_result.set_status(phantom.APP_SUCCESS, f"Object Id not available")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -698,6 +703,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
+
 def main():
     import argparse
 
@@ -709,6 +715,7 @@ def main():
     connector.initialize()
     connector.handle_action({"config": args.config})
     connector.finalize()
+
 
 if __name__ == '__main__':
     main()
