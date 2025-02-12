@@ -9,10 +9,12 @@ import datetime
 import hashlib
 import hmac
 from typing import Optional
+
 import phantom.app as phantom
 import requests
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
+
 from specteropsbloodhound_consts import *
 
 
