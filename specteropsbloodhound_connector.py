@@ -42,9 +42,11 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, {})
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
-            ),
-            None,
+                action_result.set_status(
+                    phantom.APP_ERROR, "Empty response and no information in the header"
+                ),
+                None,
+            )
         )
 
     def _process_html_response(self, response, action_result):
@@ -164,31 +166,19 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         # Here, types is a list of strings
         types = path_ids_response["data"]
         self.debug_print(f"Fetched Types for Domain ID {domain_id}: {types}")
-        self.save_progress(
-            f"The domain with ID {domain_id} has {len(types)} types in total"
-        )
+        self.save_progress(f"The domain with ID {domain_id} has {len(types)} types in total")
         return types
 
     def _fetch_finding_details_by_pages(
         self, domain_id, finding_type, skip, limit, action_result
     ):
         # Using the finding_type directly as it's a string now
-        self.debug_print(
-            f"Fetching findings for domain id {domain_id} and type {finding_type} for current page"
-        )
+        self.debug_print(f"Fetching findings for domain id {domain_id} and type {finding_type} for current page")
         self.debug_print(f"Fetch {limit} finding by skipping {skip} findings")
-        findings_endpoint = (
-            f"/api/v2/domains/{domain_id}/details?"
-            f"finding={finding_type}&skip={skip}&limit={limit}"
-        )
-        ret_val, details_response = self._request(
-            "GET", findings_endpoint, action_result
-        )
+        findings_endpoint = f"/api/v2/domains/{domain_id}/details?" f"finding={finding_type}&skip={skip}&limit={limit}"
+        ret_val, details_response = self._request("GET", findings_endpoint, action_result)
         if phantom.is_fail(ret_val):
-            self.save_progress(
-                f"Failed to fetch findings for Finding Type: {finding_type}"
-                f" in Domain ID: {domain_id}"
-            )
+            self.save_progress(f"Failed to fetch findings for Finding Type: {finding_type}" f" in Domain ID: {domain_id}")
             return
         return ret_val, details_response
 
