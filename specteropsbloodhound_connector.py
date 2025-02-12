@@ -193,9 +193,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     def _fetch_severity_for_attack_path_type(self, domain_id, finding_type, action_result):
         self.save_progress(f"Fetching severity for the domain ID {domain_id} and type {finding_type}")
         findings_endpoint = f"/api/v2/domains/{domain_id}/sparkline?finding={finding_type}&sort_by=updated_at"
-        ret_val, sparklines_response = self._request(
-            "GET", findings_endpoint, action_result
-        )
+        ret_val, sparklines_response = self._request("GET", findings_endpoint, action_result)
         if phantom.is_fail(ret_val):
             self.save_progress(f"Failed to fetch sparklines for Finding Type: {finding_type} in Domain ID: {domain_id}")
             return
@@ -282,9 +280,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.debug_print("Creating the artifact details for From Principal")
         principal_artifact_details = None
         if "FromPrincipalKind" in finding:
-            cef, cef_types = self._create_cef_field_and_types_for_principal(
-                finding["FromPrincipalProps"]
-            )
+            cef, cef_types = self._create_cef_field_and_types_for_principal(finding["FromPrincipalProps"])
             principal_artifact_details = {
                 "source_data_identifier": finding["FromPrincipal"],
                 "name": finding["FromPrincipalProps"]["name"],
@@ -351,13 +347,11 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         container_json["name"] = f"{domain_name} : {path_title} : {finding_id}"
         container_json["data"] = finding
         container_json["description"] = finding_type
-        container_json["source_data_identifier"] = (f"{domain_name}:{path_title.strip()}:{finding_id}")
+        container_json["source_data_identifier"] = f"{domain_name}:{path_title.strip()}:{finding_id}"
         container_json["severity"] = self._convert_risk_to_severity(finding["composite_risk"])
 
         self.debug_print(f"Create artifacts for the the finding id: {finding['id']}")
-        if self._does_container_exist_for_finding(
-            f"{domain_name}:{path_title.strip()}:{finding_id}"
-        ):
+        if self._does_container_exist_for_finding(f"{domain_name}:{path_title.strip()}:{finding_id}"):
             container_json["artifacts"] = []
         else:
             container_json["artifacts"] = self._get_artifacts_dict_for_finding(finding)
@@ -428,9 +422,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             is_new_container_created = True
         else:
             # Container exists, which means this Finding has been ingested before. Update it.
-            success = self._update_container_for_attack_finding(
-                existing_container_id, container
-            )
+            success = self._update_container_for_attack_finding(existing_container_id, container)
             is_new_container_created = False
         self.num_artifacts += len(container["artifacts"])
         return is_new_container_created if success else phantom.APP_ERROR
@@ -461,9 +453,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             return None
 
     def _save_or_update_artifact(self, container_id, artifact):
-        existing_artifact = self._get_artifact(
-            artifact["source_data_identifier"], container_id
-        )
+        existing_artifact = self._get_artifact(artifact["source_data_identifier"], container_id)
         if existing_artifact:
             # We have an existing artifact. Update it.
             artifact["container_id"] = existing_artifact["container"]
@@ -531,7 +521,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                     if max_limit_reached:
                         if max_artifact_limit is not None and self.num_artifacts > max_artifact_limit:
                             self.save_progress(
-                                f"{self.num_artifacts - max_artifact_limit} extra artifacts ""is created to maintain correct container details"
+                                f"{self.num_artifacts - max_artifact_limit} extra artifacts " "is created to maintain correct container details"
                             )
                         break
                 if max_limit_reached:
