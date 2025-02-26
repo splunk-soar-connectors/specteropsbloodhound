@@ -10,7 +10,7 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "SpecterOps",
-    "license": "Copyright (c) SpecterOps, 2024",
+    "license": "Copyright (c) SpecterOps, 2025",
     "app_version": "1.0.0",
     "utctime_updated": "2024-11-22T08:03:27.498107Z",
     "package_name": "phantom_specteropsbloodhound",
