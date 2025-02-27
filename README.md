@@ -1,33 +1,20 @@
-# SpecterOps BloodHound App
+[comment]: # "Auto-generated SOAR connector documentation"
+# SpecterOps BloodHound
 
-**Publisher**: SpecterOps  
-**Contributors**: N/A  
-**App Version**: 1.0.0  
-**Product Vendor**: SpecterOps  
-**Product Name**: SpecterOps BloodHound  
-**Supported Product Version (Regex)**: `.*`
+Publisher: SpecterOps  
+Connector Version: 1.0.0  
+Product Vendor: SpecterOps  
+Product Name: Specterops Bloodhound  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 6.3.0  
 
----
+BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly. Defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with SpecterOps BloodHound enables the defenders to see all the attack path findings from BloodHound as Splunk SOAR events. The actions provided with the app can be used to remediate and remove the attack paths
 
 ## Overview
 
 BloodHound uses graph theory to reveal hidden and often unintended relationships within Active Directory or Azure environments. Attackers use BloodHound to identify complex attack paths quickly. Defenders leverage it to identify and eliminate these same attack paths.
 
 The SOAR integration with SpecterOps BloodHound enables defenders to see all attack path findings as Splunk SOAR events. Additionally, the app provides actions to remediate and remove these attack paths.
-
----
-
-## Configuration Variables
-
-The following configuration variables are required to set up the SpecterOps BloodHound App in Splunk SOAR:
-
-| **Variable**            | **Required** | **Type**   | **Description**                      |
-|--------------------------|--------------|------------|---------------------------------------|
-| `token_id`              | Required     | Password   | Token ID                              |
-| `token_key`             | Required     | Password   | Token Key                             |
-| `bloodhound_base_url`   | Required     | String     | BloodHound Enterprise Domain          |
-
----
 
 ## Supported Actions
 
@@ -48,104 +35,124 @@ The following configuration variables are required to set up the SpecterOps Bloo
    Fetch the path between two objects.  
    *Works in both Enterprise and Community Edition (CE).*
 
----
+## Prerequisites
 
-### Action: Get Object ID  
-**Description**: Fetch the object ID from an asset's name.  
-**Type**: Investigate  
-**Read Only**: No  
+1. **Access To BloodHound Enterprise Server**
+    You must have access to the BloodHound Enterprise server to generate Token Key and Token ID for authentication.
 
-#### Parameters
 
-| **Parameter** | **Required** | **Description** | **Type** |
-|---------------|--------------|-----------------|----------|
-| `name`        | Required     | Name            | String   |
-#### Output
 
-| **Data Path**                      | **Type**   |
-|------------------------------------|------------|
-| `action_result.parameter.name`    | String     |
-| `action_result.data.*.object_id`  | String     |
-| `action_result.message`           | String     |
-| `summary.total_objects`           | Numeric    |
-| `summary.total_objects_successful`| Numeric    |
 
----
+### Configuration Variables
+The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a Specterops Bloodhound asset in SOAR.
 
-### Action: Test Connectivity  
-**Description**: Validate the asset configuration for connectivity using the supplied configuration.  
-**Type**: Test  
-**Read Only**: Yes  
+VARIABLE | REQUIRED | TYPE | DESCRIPTION
+-------- | -------- | ---- | -----------
+**bloodhound_base_url** |  required  | string | BloodHound Enterprise Domain
+**token_id** |  required  | password | Token ID
+**token_key** |  required  | password | Token Key
 
-#### Parameters
+### Supported Actions  
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
+[on poll](#action-on-poll) - Pull Attack Path Finding Details  
+[fetch asset information](#action-fetch-asset-information) - Pull information related to an asset from the API (works in Enterprise or CE)  
+[does path exist](#action-does-path-exist) - Pull a path between two objects (works in Enterprise or CE)  
+[get object id](#action-get-object-id) - Fetch object id from asset's name  
 
-_No parameters required._
+## action: 'test connectivity'
+Validate the asset configuration for connectivity using supplied configuration
 
-#### Output
+Type: **test**  
+Read only: **True**
 
-_No output._
+#### Action Parameters
+No parameters are required for this action
 
----
+#### Action Output
+No Output  
 
-### Action: On Poll  
-**Description**: Pull Attack Path Finding details.  
-**Type**: Ingest  
-**Read Only**: No  
+## action: 'on poll'
+Pull Attack Path Finding Details
 
-#### Parameters
+Type: **ingest**  
+Read only: **False**
 
-_No parameters required._
+#### Action Parameters
+No parameters are required for this action
 
-#### Output
+#### Action Output
+No Output  
 
-_No output._
+## action: 'fetch asset information'
+Pull information related to an asset from the API (works in Enterprise or CE)
 
----
+Type: **investigate**  
+Read only: **False**
 
-### Action: Fetch Asset Information  
-**Description**: Retrieve information related to an asset from the API.  
-*Works in both Enterprise and Community Edition (CE).*  
-**Type**: Investigate  
-**Read Only**: No  
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**object_id** |  required  | Object Id | string | 
 
-#### Parameters
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.data.\*.data.props.name | string |  |  
+action_result.data.\*.data.props.domain | string |  |  
+action_result.data.\*.data.props.objectid | string |  |  
+action_result.data.\*.data.props.domainsid | string |  |  
+action_result.data.\*.data.props.functionallevel | string |  |  
+action_result.data.\*.data.props.distinguishedname | string |  |  
+action_result.data.\*.data.props.isaclprotected | boolean |  |  
+action_result.data.data.\*.props.system_tags | string |  |  
+action_result.message | string |  |  
+action_result.summary | string |  |  
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
+action_result.status | string |  |   success  failed   
 
-| **Parameter**   | **Required** | **Description** | **Type**   |
-|------------------|--------------|-----------------|------------|
-| `object_id`     | Required     | Object ID       | String     |
+## action: 'does path exist'
+Pull a path between two objects (works in Enterprise or CE)
 
-#### Output
+Type: **investigate**  
+Read only: **False**
 
-| **Data Path**                                       | **Type**   |
-|----------------------------------------------------|------------|
-| `action_result.data.data.*.props.name`                  | String     |
-| `action_result.data.data.*.props.domain`                | String     |
-| `action_result.data.data.*.props.objectid`              | String     |
-| `action_result.data.data.*.props.domainsid`             | String     |
-| `action_result.data.data.*.props.functionallevel`       | String     |
-| `action_result.data.data.*.props.distinguishedname`     | String     |
-| `action_result.data.data.*.props.isaclprotected`        | Boolean    |
-| `action_result.data.data.*.props.system_tags`           | String     |
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**start_node** |  required  | Start Node | string | 
+**end_node** |  required  | End Node | string | 
 
----
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.parameter.start_node | string |  |  
+action_result.parameter.end_node | string |  |  
+action_result.data.\*.response | string |  |  
+action_result.message | string |  |  
+action_result.summary | string |  |  
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
+action_result.status | string |  |   success  failed   
 
-### Action: Does Path Exist  
-**Description**: Fetch a path between two objects.  
-*Works in both Enterprise and Community Edition (CE).*  
-**Type**: Investigate  
-**Read Only**: No  
+## action: 'get object id'
+Fetch object id from asset's name
 
-#### Parameters
+Type: **investigate**  
+Read only: **False**
 
-| **Parameter**   | **Required** | **Description** | **Type**   |
-|------------------|--------------|-----------------|------------|
-| `start_node`     | Required     | Start Node      | String     |
-| `end_node`       | Required     | End Node        | String     |
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**name** |  required  | Name | string | 
 
-#### Output
-
-| **Data Path**                      | **Type**   |
-|------------------------------------|------------|
-| `action_result.parameter.start_node` | String    |
-| `action_result.parameter.end_node`   | String    |
-| `action_result.data.*.response`      | String    |
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.parameter.name | string |  |  
+action_result.data.\*.object_id | string |  |  
+action_result.message | string |  |  
+action_result.summary | string |  |  
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
+action_result.status | string |  |   success  failed 
