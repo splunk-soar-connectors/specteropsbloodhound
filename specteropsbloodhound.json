@@ -1,0 +1,301 @@
+{
+    "appid": "f657a38f-6649-4022-8d93-21fb69a51055",
+    "name": "SpecterOps BloodHound",
+    "description": "BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly. Defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with SpecterOps BloodHound enables the defenders to see all the attack path findings from BloodHound as Splunk SOAR events. The actions provided with the app can be used to remediate and remove the attack paths",
+    "type": "network security",
+    "product_vendor": "SpecterOps",
+    "logo": "specteropsbloodhound.svg",
+    "logo_dark": "specteropsbloodhound_dark.svg",
+    "product_name": "Specterops Bloodhound",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "SpecterOps",
+    "license": "Copyright (c) SpecterOps, 2025",
+    "app_version": "1.0.1",
+    "utctime_updated": "2024-11-22T08:03:27.498107Z",
+    "package_name": "phantom_specteropsbloodhound",
+    "main_module": "specteropsbloodhound_connector.py",
+    "min_phantom_version": "6.3.0",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "bloodhound_base_url": {
+            "description": "BloodHound Enterprise Domain",
+            "data_type": "string",
+            "required": true,
+            "default": "https://demo.bloodhoundenterprise.io",
+            "order": 0
+        },
+        "token_id": {
+            "description": "Token ID",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "token_key": {
+            "description": "Token Key",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Pull Attack Path Finding Details",
+            "type": "ingest",
+            "read_only": false,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "fetch asset information",
+            "identifier": "fetch_asset_information",
+            "description": "Pull information related to an asset from the API (works in Enterprise or CE)",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "object_id": {
+                    "description": "Object Id",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.data.props.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.domain",
+                    "data_type": "string",
+                    "column_name": "Domain",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.objectid",
+                    "data_type": "string",
+                    "column_name": "Object ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.domainsid",
+                    "data_type": "string",
+                    "column_name": "Domain Sid",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.functionallevel",
+                    "data_type": "string",
+                    "column_name": "Functional Level",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.distinguishedname",
+                    "data_type": "string",
+                    "column_name": "Distinguished Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.data.props.isaclprotected",
+                    "data_type": "boolean",
+                    "column_name": "Is ACL Protected",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.data.*.props.system_tags",
+                    "data_type": "string",
+                    "column_name": "System Tags",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "Name": "Asset Information"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "does path exist",
+            "identifier": "does_path_exist",
+            "description": "Pull a path between two objects (works in Enterprise or CE)",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "start_node": {
+                    "description": "Start Node",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "end_node": {
+                    "description": "End Node",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.start_node",
+                    "data_type": "string",
+                    "column_name": "Start Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.end_node",
+                    "data_type": "string",
+                    "column_name": "End Node",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.response",
+                    "data_type": "string",
+                    "column_name": "Does Path Exist",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get object id",
+            "identifier": "get_object_id",
+            "description": "Fetch object id from asset's name",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Name",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.object_id",
+                    "data_type": "string",
+                    "column_name": "Object ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
