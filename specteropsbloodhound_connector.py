@@ -28,15 +28,13 @@ from specteropsbloodhound_consts import *
 
 
 class RetVal(tuple):
-
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
 
 
 class SpecteropsbloodhoundConnector(BaseConnector):
-
     def __init__(self):
-        super(SpecteropsbloodhoundConnector, self).__init__()
+        super().__init__()
         self._state = None
         self._base_url = None
         self._token_key = None
@@ -71,14 +69,14 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             return RetVal(
-                action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. Error: {str(e)}"),
+                action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. Error: {e!s}"),
                 None,
             )
 
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = f"Error from server. Status Code: {r.status_code} Data from server: {r.text.replace(u'{', '{{').replace(u'}', '}}')}"
+        message = f"Error from server. Status Code: {r.status_code} Data from server: {r.text.replace('{', '{{').replace('}', '}}')}"
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
@@ -124,7 +122,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             )
         except Exception as e:
             return RetVal(
-                action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {str(e)}"),
+                action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {e!s}"),
                 None,
             )
 
@@ -172,10 +170,10 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         # Using the finding_type directly as it's a string now
         self.debug_print(f"Fetching findings for domain id {domain_id} and type {finding_type} for current page")
         self.debug_print(f"Fetch {limit} finding by skipping {skip} findings")
-        findings_endpoint = f"/api/v2/domains/{domain_id}/details?" f"finding={finding_type}&skip={skip}&limit={limit}"
+        findings_endpoint = f"/api/v2/domains/{domain_id}/details?finding={finding_type}&skip={skip}&limit={limit}"
         ret_val, details_response = self._request("GET", findings_endpoint, action_result)
         if phantom.is_fail(ret_val):
-            self.save_progress(f"Failed to fetch findings for Finding Type: {finding_type}" f" in Domain ID: {domain_id}")
+            self.save_progress(f"Failed to fetch findings for Finding Type: {finding_type} in Domain ID: {domain_id}")
             return
         return ret_val, details_response
 
@@ -368,9 +366,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         return container_json
 
     def _does_container_exist_for_finding(self, source_data_identifier):
-        url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}'.format(
-            self.get_phantom_base_url(), source_data_identifier, self.get_asset_id()
-        )
+        url = f'{self.get_phantom_base_url()}rest/container?_filter_source_data_identifier="{source_data_identifier}"&_filter_asset={self.get_asset_id()}'
         existing_container_id = False
 
         try:
@@ -378,7 +374,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Unable to query container: {0}".format(err))
+            self.debug_print(f"Unable to query container: {err}")
             return False
 
         if resp_json.get("count", 0) <= 0:
@@ -389,7 +385,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             existing_container_id = resp_json.get("data", [])[0]["id"]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Container results are not proper: {0}".format(err))
+            self.debug_print(f"Container results are not proper: {err}")
             return False
 
         return existing_container_id
@@ -400,7 +396,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             self.debug_print(f"Updating container with id {existing_container_id}")
             update_json = container.copy()
             del update_json["artifacts"]
-            url = "{0}rest/container/{1}".format(self.get_phantom_base_url(), existing_container_id)
+            url = f"{self.get_phantom_base_url()}rest/container/{existing_container_id}"
             r = requests.post(url, json=update_json, verify=False, timeout=DEFAULT_REQUEST_TIMEOUT)  # nosemgrep
             resp_json = r.json()
 
@@ -413,7 +409,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                 )
                 return False
         except Exception as e:
-            self.debug_print("Error occurred while updating the container. {}".format(e))
+            self.debug_print(f"Error occurred while updating the container. {e}")
             return False
 
         return True
@@ -437,28 +433,24 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         return is_new_container_created if success else phantom.APP_ERROR
 
     def _get_artifact(self, source_data_identifier, container_id):
-        url = '{0}rest/artifact?_filter_source_data_identifier="{1}"&_filter_container_id={2}&sort=id&order=desc'.format(
-            self.get_phantom_base_url(), source_data_identifier, container_id
-        )
+        url = f'{self.get_phantom_base_url()}rest/artifact?_filter_source_data_identifier="{source_data_identifier}"&_filter_container_id={container_id}&sort=id&order=desc'
         try:
             r = requests.get(url, verify=False, timeout=60)  # nosemgrep
             resp_json = r.json()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Exception when querying for artifact ID: {0}".format(err))
+            self.debug_print(f"Exception when querying for artifact ID: {err}")
             return None
 
         if resp_json.get("count", 0) <= 0:
-            self.debug_print(
-                "No artifact matched the source_data_identifier {0} and container id {1}".format(source_data_identifier, container_id)
-            )
+            self.debug_print(f"No artifact matched the source_data_identifier {source_data_identifier} and container id {container_id}")
             return None
 
         try:
             return resp_json.get("data", [])[0]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Exception when parsing artifact results: {0}".format(err))
+            self.debug_print(f"Exception when parsing artifact results: {err}")
             return None
 
     def _save_or_update_artifact(self, container_id, artifact):
@@ -467,11 +459,11 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             # We have an existing artifact. Update it.
             artifact["container_id"] = existing_artifact["container"]
             artifact["id"] = existing_artifact["id"]
-            self.debug_print("Updating artifact {0}".format(artifact["name"]), artifact)
+            self.debug_print("Updating artifact {}".format(artifact["name"]), artifact)
             self.save_artifacts([artifact])
         else:
             # This is a new artifact. Save it directly.
-            self.debug_print("Saving new artifact {0}".format(artifact["name"]), artifact)
+            self.debug_print("Saving new artifact {}".format(artifact["name"]), artifact)
             artifact["container_id"] = container_id
             self.save_artifact(artifact)
 
@@ -530,7 +522,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
                     if max_limit_reached:
                         if max_artifact_limit is not None and self.num_artifacts > max_artifact_limit:
                             self.save_progress(
-                                f"{self.num_artifacts - max_artifact_limit} extra artifacts " "is created to maintain correct container details"
+                                f"{self.num_artifacts - max_artifact_limit} extra artifacts is created to maintain correct container details"
                             )
                         break
                 if max_limit_reached:
@@ -547,7 +539,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         )
 
     def _handle_fetch_asset_information(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         object_id = param.get("object_id")
@@ -633,9 +625,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     ):
         """Update the primary response with data from related types."""
         api_path = (
-            f"/api/v2/azure/{self._get_azure_type_path(obj_type)}"
-            f"?object_id={object_id}&related_entity_type={related_type}"
-            "&skip=0&limit=128"
+            f"/api/v2/azure/{self._get_azure_type_path(obj_type)}?object_id={object_id}&related_entity_type={related_type}&skip=0&limit=128"
         )
         secondary_response = self._call_api(api_path, action_result)
         if not secondary_response or "count" not in secondary_response:
@@ -654,7 +644,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         return response
 
     def _handle_does_path_exist(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         start_node = param.get("start_node")
         end_node = param.get("end_node")
@@ -667,7 +657,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_object_id(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param.get("name").replace(" ", "%20")
         ret_val, response = self._request("GET", f"/api/v2/search?q={name}", action_result)

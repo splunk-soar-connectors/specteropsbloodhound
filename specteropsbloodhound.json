@@ -151,6 +151,10 @@
                         "success",
                         "failed"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.object_id",
+                    "data_type": "string"
                 }
             ],
             "render": {

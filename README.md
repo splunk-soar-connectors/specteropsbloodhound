@@ -116,6 +116,7 @@ action_result.summary | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 action_result.status | string | | success failed |
+action_result.parameter.object_id | string | | |
 
 ## action: 'does path exist'
 
