@@ -1,6 +1,6 @@
 {
     "appid": "f657a38f-6649-4022-8d93-21fb69a51055",
-    "name": "SpecterOps BloodHound",
+    "name": "BloodHound Enterprise - SplunkSOAR",
     "description": "BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly. Defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with SpecterOps BloodHound enables the defenders to see all the attack path findings from BloodHound as Splunk SOAR events. The actions provided with the app can be used to remediate and remove the attack paths",
     "type": "network security",
     "product_vendor": "SpecterOps",
@@ -22,7 +22,7 @@
             "description": "BloodHound Enterprise Domain",
             "data_type": "string",
             "required": true,
-            "default": "https://demo.bloodhoundenterprise.io",
+            "default": "<BloodHound Enterprise Domain>",
             "order": 0
         },
         "token_id": {
