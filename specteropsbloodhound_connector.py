@@ -197,21 +197,6 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.save_progress(f"Successfully fetched total {len(all_findings_for_type)} findings for domain id {domain_id} and type {finding_type}")
         return all_findings_for_type
 
-    def _fetch_severity_for_attack_path_type(self, domain_id, finding_type, action_result):
-        self.save_progress(f"Fetching severity for the domain ID {domain_id} and type {finding_type}")
-        findings_endpoint = f"/api/v2/domains/{domain_id}/sparkline?finding={finding_type}&sort_by=updated_at"
-        ret_val, sparklines_response = self._request("GET", findings_endpoint, action_result)
-        if phantom.is_fail(ret_val):
-            self.save_progress(f"Failed to fetch sparklines for Finding Type: {finding_type} in Domain ID: {domain_id}")
-            return
-        num_sparklines = len(sparklines_response["data"])
-        self.debug_print(f"Found {len(sparklines_response['data'])} sparklines")
-        self.debug_print("Fetch the Composite Risk from the last sparkline")
-        composite_risk = sparklines_response["data"][num_sparklines - 1]["CompositeRisk"]
-        self.debug_print(f"Fetched composite risk for finding type {finding_type} as {composite_risk}")
-
-        return composite_risk
-
     def _get_cef_type(self, field_name):
         self.debug_print("Get the CEF type for the fields, as per it's name")
         # Following are all the possible field types, we have only mapped a few out of those
@@ -315,11 +300,11 @@ class SpecteropsbloodhoundConnector(BaseConnector):
 
         return artifacts
 
-    def _convert_risk_to_severity(self, composite_risk):
+    def _convert_risk_to_severity(self, risk):
         severity = "low"
-        if composite_risk > 33.33:
+        if risk > 33.33:
             severity = "medium"
-        if composite_risk > 66.66:
+        if risk > 66.66:
             severity = "high"
         return severity
 
@@ -355,7 +340,7 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         container_json["data"] = finding
         container_json["description"] = finding_type
         container_json["source_data_identifier"] = f"{domain_name}:{path_title.strip()}:{finding_id}"
-        container_json["severity"] = self._convert_risk_to_severity(finding["composite_risk"])
+        container_json["severity"] = self._convert_risk_to_severity(finding["severity"])
 
         self.debug_print(f"Create artifacts for the the finding id: {finding['id']}")
         if self._does_container_exist_for_finding(f"{domain_name}:{path_title.strip()}:{finding_id}"):
@@ -505,11 +490,15 @@ class SpecteropsbloodhoundConnector(BaseConnector):
             for finding_type in types:
                 # Using the finding_type directly as it's a string now
                 all_findings_for_type = self._fetch_all_findings_information(domain_id, finding_type, action_result)
-                composite_risk = self._fetch_severity_for_attack_path_type(domain_id, finding_type, action_result)
 
-                self.debug_print(f"Add Composite Risk value {composite_risk} to each finding")
                 for single_finding in all_findings_for_type:
-                    single_finding["composite_risk"] = composite_risk
+                    if "Principal" in single_finding:
+                        single_finding['severity'] = single_finding['ImpactPercentage'] * 100
+                    elif finding_type.startswith("LargeDefaultGroups"):
+                        single_finding['severity'] = single_finding['ImpactPercentage'] * 100
+                    else:
+                        single_finding['severity'] = single_finding['ExposurePercentage'] * 100
+
                     is_new_container_created = self._ingest_finding(single_finding, domain_name, action_result)
                     if is_new_container_created:
                         container_count += 1
