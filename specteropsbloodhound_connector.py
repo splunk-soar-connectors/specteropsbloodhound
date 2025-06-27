@@ -493,11 +493,11 @@ class SpecteropsbloodhoundConnector(BaseConnector):
 
                 for single_finding in all_findings_for_type:
                     if "Principal" in single_finding:
-                        single_finding['severity'] = single_finding['ImpactPercentage'] * 100
+                        single_finding["severity"] = single_finding["ImpactPercentage"] * 100
                     elif finding_type.startswith("LargeDefaultGroups"):
-                        single_finding['severity'] = single_finding['ImpactPercentage'] * 100
+                        single_finding["severity"] = single_finding["ImpactPercentage"] * 100
                     else:
-                        single_finding['severity'] = single_finding['ExposurePercentage'] * 100
+                        single_finding["severity"] = single_finding["ExposurePercentage"] * 100
 
                     is_new_container_created = self._ingest_finding(single_finding, domain_name, action_result)
                     if is_new_container_created:
