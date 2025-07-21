@@ -7,7 +7,7 @@
     "logo": "specteropsbloodhound.svg",
     "logo_dark": "specteropsbloodhound_dark.svg",
     "product_name": "Specterops Bloodhound",
-    "python_version": "3",
+    "python_version": ["3.9", "3.13"],
     "product_version_regex": ".*",
     "publisher": "SpecterOps",
     "license": "Copyright (c) SpecterOps, 2025",
