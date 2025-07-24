@@ -1,7 +1,7 @@
 # BloodHound Enterprise for Splunk SOAR
 
 Publisher: SpecterOps <br>
-Connector Version: 1.0.1 <br>
+Connector Version: 1.0.2 <br>
 Product Vendor: SpecterOps <br>
 Product Name: Specterops Bloodhound <br>
 Minimum Product Version: 6.3.0
