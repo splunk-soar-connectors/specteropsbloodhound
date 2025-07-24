@@ -1,4 +1,4 @@
-# BloodHound Enterprise - SplunkSOAR
+# BloodHound Enterprise for Splunk SOAR
 
 Publisher: SpecterOps <br>
 Connector Version: 1.0.1 <br>
@@ -47,7 +47,7 @@ The SOAR integration with SpecterOps BloodHound enables defenders to see all att
 
 ### Configuration variables
 
-This table lists the configuration variables required to operate BloodHound Enterprise - SplunkSOAR. These variables are specified when configuring a Specterops Bloodhound asset in Splunk SOAR.
+This table lists the configuration variables required to operate BloodHound Enterprise for Splunk SOAR. These variables are specified when configuring a Specterops Bloodhound asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
