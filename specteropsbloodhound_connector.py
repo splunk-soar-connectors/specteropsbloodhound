@@ -18,6 +18,7 @@ import datetime
 import hashlib
 import hmac
 from typing import Optional
+from urllib.parse import quote
 
 import phantom.app as phantom
 import requests
@@ -531,8 +532,8 @@ class SpecteropsbloodhoundConnector(BaseConnector):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param.get("object_id")
-        ret_val, response = self._request("GET", f"/api/v2/search?q={object_id}", action_result)
+        object_id = quote(param.get("object_id", ""), safe="")
+        _ret_val, response = self._request("GET", f"/api/v2/search?q={object_id}", action_result)
         if not response["data"]:
             return action_result.set_status(phantom.APP_SUCCESS, "Object Id not available")
 
@@ -635,10 +636,10 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     def _handle_does_path_exist(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
-        start_node = param.get("start_node")
-        end_node = param.get("end_node")
+        start_node = quote(param.get("start_node", ""), safe="")
+        end_node = quote(param.get("end_node", ""), safe="")
         endpoint = f"/api/v2/graphs/shortest-path?start_node={start_node}&end_node={end_node}"
-        ret_val, response = self._request("GET", endpoint, action_result)
+        ret_val, _response = self._request("GET", endpoint, action_result)
         if ret_val:
             action_result.add_data({"response": True})
         else:
@@ -648,8 +649,8 @@ class SpecteropsbloodhoundConnector(BaseConnector):
     def _handle_get_object_id(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
-        name = param.get("name").replace(" ", "%20")
-        ret_val, response = self._request("GET", f"/api/v2/search?q={name}", action_result)
+        name = quote(param.get("name", ""), safe="")
+        _ret_val, response = self._request("GET", f"/api/v2/search?q={name}", action_result)
         data = response["data"]
         if data:
             exact_match = next(
