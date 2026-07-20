@@ -1,3 +1,3 @@
 **Unreleased**
 
-* - Encoded BloodHound action identifiers in API paths and query parameters.
+* Encoded BloodHound action identifiers in API paths and query parameters.
