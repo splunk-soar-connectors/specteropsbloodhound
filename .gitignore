@@ -1,0 +1,9 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local uv / pre-commit environments (classic JSON app, not an SDK app)
+.venv/
+uv.lock
+.python-version
