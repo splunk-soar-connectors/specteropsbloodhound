@@ -12,7 +12,7 @@
     "publisher": "SpecterOps",
     "license": "Copyright (c) SpecterOps, 2026",
     "app_version": "1.0.4",
-    "utctime_updated": "2024-11-22T08:03:27.498107Z",
+    "utctime_updated": "2026-09-18T11:53:18.420559Z",
     "package_name": "phantom_specteropsbloodhound",
     "main_module": "specteropsbloodhound_connector.py",
     "min_phantom_version": "7.0.0",
