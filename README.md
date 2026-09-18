@@ -1,10 +1,10 @@
 # BloodHound Enterprise for Splunk SOAR
 
 Publisher: SpecterOps <br>
-Connector Version: 1.0.3 <br>
+Connector Version: 1.0.4 <br>
 Product Vendor: SpecterOps <br>
 Product Name: Specterops Bloodhound <br>
-Minimum Product Version: 6.3.0
+Minimum Product Version: 7.0.0
 
 BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly, and defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with BloodHound Enterprise (powered by SpecterOps) lets defenders see all Attack Path findings from BloodHound as Splunk SOAR events. This enables rapid remediation of these risks within your environment. All actions support all BloodHound products unless otherwise noted.
 

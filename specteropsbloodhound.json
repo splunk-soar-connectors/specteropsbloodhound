@@ -4,18 +4,18 @@
     "description": "BloodHound uses graph theory to reveal the hidden and often unintended relationships within an Active Directory or Azure environment. Attackers can use BloodHound to easily identify highly complex attack paths that would otherwise be impossible to identify quickly, and defenders can use BloodHound to identify and eliminate those same attack paths. The SOAR integration with BloodHound Enterprise (powered by SpecterOps) lets defenders see all Attack Path findings from BloodHound as Splunk SOAR events. This enables rapid remediation of these risks within your environment. All actions support all BloodHound products unless otherwise noted.\n\nSupported Actions\n[BHE Only] Pull Attack Path finding details: Queries the BloodHound Enterprise API to collect new and updated findings for your environment.\nTest Connectivity: Validate connectivity to the BloodHound environment specified by the supplied configuration.\nFetch asset information: Pull information related to an asset from the BloodHound API.\nDoes path exist: Determines whether a valid Attack Path exists between two objects within BloodHound.\nGet object ID: Fetch an object's ID from its name.",
     "type": "network security",
     "product_vendor": "SpecterOps",
-    "logo": "specteropsbloodhound.svg",
-    "logo_dark": "specteropsbloodhound_dark.svg",
+    "logo": "logo_specteropsbloodhound.svg",
+    "logo_dark": "logo_specteropsbloodhound_dark.svg",
     "product_name": "Specterops Bloodhound",
-    "python_version": "3",
+    "python_version": "3.13",
     "product_version_regex": ".*",
     "publisher": "SpecterOps",
-    "license": "Copyright (c) SpecterOps, 2025-2026",
-    "app_version": "1.0.3",
-    "utctime_updated": "2026-07-20T18:25:52.416399Z",
+    "license": "Copyright (c) SpecterOps, 2026",
+    "app_version": "1.0.4",
+    "utctime_updated": "2024-11-22T08:03:27.498107Z",
     "package_name": "phantom_specteropsbloodhound",
     "main_module": "specteropsbloodhound_connector.py",
-    "min_phantom_version": "6.3.0",
+    "min_phantom_version": "7.0.0",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "bloodhound_base_url": {
@@ -302,10 +302,10 @@
             "versions": "EQ(*)"
         }
     ],
-    "pip39_dependencies": {
+    "pip313_dependencies": {
         "wheel": []
     },
-    "pip313_dependencies": {
+    "pip39_dependencies": {
         "wheel": []
     }
 }
